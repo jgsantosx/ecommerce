@@ -22,20 +22,25 @@ public class ProductService {
         this.categoryRepository = categoryRepository;
     }
 
-    public List<Product> findAll() {
-        return productRepository.findAll();
+    public List<ProductResponse> findAll() {
+        return productRepository.findAll()
+                .stream()
+                .map(ProductResponse::fromEntity)
+                .toList();
     }
 
-    public Product findById(Long id) {
-        return productRepository.findById(id)
+    public ProductResponse findById(Long id) {
+        Product product = productRepository.findById(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
                                 "Produto não encontrado: " + id
                         )
                 );
+
+        return ProductResponse.fromEntity(product);
     }
 
-    public Product create(ProductCreateRequest request) {
+    public ProductResponse create(ProductCreateRequest request) {
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
@@ -53,10 +58,15 @@ public class ProductService {
         product.setCategory(category);
         product.setCreatedAt(LocalDateTime.now());
 
-        return productRepository.save(product);
+        Product savedProduct = productRepository.save(product);
+
+        return ProductResponse.fromEntity(savedProduct);
     }
 
-    public Product update(Long id, ProductUpdateRequest request) {
+    public ProductResponse update(
+            Long id,
+            ProductUpdateRequest request
+    ) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
@@ -81,7 +91,9 @@ public class ProductService {
             product.setActive(request.getActive());
         }
 
-        return productRepository.save(product);
+        Product updatedProduct = productRepository.save(product);
+
+        return ProductResponse.fromEntity(updatedProduct);
     }
 
     public void delete(Long id) {

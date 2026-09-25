@@ -1,5 +1,4 @@
 package com.ecommerce.product;
-
 import com.ecommerce.category.Category;
 import com.ecommerce.category.CategoryRepository;
 import com.ecommerce.exception.ResourceNotFoundException;
@@ -60,7 +59,7 @@ class ProductServiceTest {
         when(productRepository.save(any(Product.class)))
                 .thenReturn(savedProduct);
 
-        Product result = productService.create(request);
+        ProductResponse result = productService.create(request);
 
         assertNotNull(result);
         assertEquals("Notebook", result.getName());
@@ -70,7 +69,8 @@ class ProductServiceTest {
         );
         assertEquals("NOTE-001", result.getSku());
         assertTrue(result.isActive());
-        assertEquals(category, result.getCategory());
+        assertNotNull(result.getCategory());
+        assertEquals("Eletrônicos", result.getCategory().getName());
 
         verify(categoryRepository).findById(1L);
         verify(productRepository).save(any(Product.class));
@@ -109,14 +109,17 @@ class ProductServiceTest {
     void shouldFindProductById() {
         Product product = new Product();
         product.setName("Notebook");
+        product.setCategory(category);
 
         when(productRepository.findById(1L))
                 .thenReturn(Optional.of(product));
 
-        Product result = productService.findById(1L);
+        ProductResponse result = productService.findById(1L);
 
         assertNotNull(result);
         assertEquals("Notebook", result.getName());
+        assertNotNull(result.getCategory());
+        assertEquals("Eletrônicos", result.getCategory().getName());
 
         verify(productRepository).findById(1L);
     }
@@ -169,7 +172,7 @@ class ProductServiceTest {
         when(productRepository.save(product))
                 .thenReturn(product);
 
-        Product result = productService.update(1L, request);
+        ProductResponse result = productService.update(1L, request);
 
         assertNotNull(result);
         assertEquals("Notebook novo", result.getName());
@@ -183,7 +186,8 @@ class ProductServiceTest {
         );
         assertEquals("NOTE-002", result.getSku());
         assertFalse(result.isActive());
-        assertEquals(newCategory, result.getCategory());
+        assertNotNull(result.getCategory());
+        assertEquals("Informática", result.getCategory().getName());
 
         verify(productRepository).findById(1L);
         verify(categoryRepository).findById(2L);

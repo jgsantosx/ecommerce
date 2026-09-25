@@ -16,24 +16,24 @@ public class ProductController {
     }
 
     @GetMapping
-    public List<Product> findAll() {
+    public List<ProductResponse> findAll() {
         return productService.findAll();
     }
 
     @GetMapping("/{id}")
-    public Product findById(@PathVariable Long id) {
+    public ProductResponse findById(@PathVariable Long id) {
         return productService.findById(id);
     }
 
     @PostMapping
-    public Product create(
+    public ProductResponse create(
             @Valid @RequestBody ProductCreateRequest request
     ) {
         return productService.create(request);
     }
 
     @PutMapping("/{id}")
-    public Product update(
+    public ProductResponse update(
             @PathVariable Long id,
             @Valid @RequestBody ProductUpdateRequest request
     ) {

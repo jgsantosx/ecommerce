@@ -16,22 +16,24 @@ public class CategoryController {
     }
 
     @GetMapping
-    public List<Category> findAll() {
+    public List<CategoryResponse> findAll() {
         return categoryService.findAll();
     }
 
     @GetMapping("/{id}")
-    public Category findById(@PathVariable Long id) {
+    public CategoryResponse findById(@PathVariable Long id) {
         return categoryService.findById(id);
     }
 
     @PostMapping
-    public Category create(@Valid @RequestBody CategoryCreateRequest request) {
+    public CategoryResponse create(
+            @Valid @RequestBody CategoryCreateRequest request
+    ) {
         return categoryService.create(request);
     }
 
     @PutMapping("/{id}")
-    public Category update(
+    public CategoryResponse update(
             @PathVariable Long id,
             @Valid @RequestBody CategoryUpdateRequest request
     ) {

@@ -15,28 +15,35 @@ public class CategoryService {
         this.categoryRepository = categoryRepository;
     }
 
-    public List<Category> findAll() {
-        return categoryRepository.findAll();
+    public List<CategoryResponse> findAll() {
+        return categoryRepository.findAll()
+                .stream()
+                .map(CategoryResponse::fromEntity)
+                .toList();
     }
 
-    public Category findById(Long id) {
-        return categoryRepository.findById(id)
+    public CategoryResponse findById(Long id) {
+        Category category = categoryRepository.findById(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
                                 "Categoria não encontrada: " + id
                         )
                 );
+
+        return CategoryResponse.fromEntity(category);
     }
 
-    public Category create(CategoryCreateRequest request) {
+    public CategoryResponse create(CategoryCreateRequest request) {
         Category category = new Category();
         category.setName(request.getName());
         category.setCreatedAt(LocalDateTime.now());
 
-        return categoryRepository.save(category);
+        Category savedCategory = categoryRepository.save(category);
+
+        return CategoryResponse.fromEntity(savedCategory);
     }
 
-    public Category update(Long id, CategoryUpdateRequest request) {
+    public CategoryResponse update(Long id, CategoryUpdateRequest request) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
@@ -46,7 +53,9 @@ public class CategoryService {
 
         category.setName(request.getName());
 
-        return categoryRepository.save(category);
+        Category updatedCategory = categoryRepository.save(category);
+
+        return CategoryResponse.fromEntity(updatedCategory);
     }
 
     public void delete(Long id) {

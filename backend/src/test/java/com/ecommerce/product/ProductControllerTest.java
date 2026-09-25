@@ -1,5 +1,6 @@
 package com.ecommerce.product;
 
+import com.ecommerce.category.CategoryResponse;
 import com.ecommerce.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -38,21 +40,34 @@ class ProductControllerTest {
 
     @Test
     void shouldReturnProductWhenIdExists() throws Exception {
-        Product product = new Product();
+        CategoryResponse categoryResponse = new CategoryResponse(
+                1L,
+                "Informática",
+                LocalDateTime.now()
+        );
 
-        product.setName("Notebook");
-        product.setPrice(new BigDecimal("4500.00"));
-        product.setSku("NOTE-001");
+        ProductResponse response = new ProductResponse(
+                1L,
+                "Notebook",
+                "Notebook para trabalho",
+                new BigDecimal("4500.00"),
+                "NOTE-001",
+                true,
+                categoryResponse,
+                LocalDateTime.now()
+        );
 
         when(productService.findById(1L))
-                .thenReturn(product);
+                .thenReturn(response);
 
         mockMvc.perform(get("/api/products/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name")
                         .value("Notebook"))
                 .andExpect(jsonPath("$.sku")
-                        .value("NOTE-001"));
+                        .value("NOTE-001"))
+                .andExpect(jsonPath("$.category.name")
+                        .value("Informática"));
     }
 
     @Test
@@ -80,16 +95,25 @@ class ProductControllerTest {
         request.setSku("NOTE-001");
         request.setCategoryId(1L);
 
-        Product product = new Product();
+        CategoryResponse categoryResponse = new CategoryResponse(
+                1L,
+                "Informática",
+                LocalDateTime.now()
+        );
 
-        product.setName("Notebook");
-        product.setDescription("Notebook para trabalho");
-        product.setPrice(new BigDecimal("4500.00"));
-        product.setSku("NOTE-001");
-        product.setActive(true);
+        ProductResponse response = new ProductResponse(
+                1L,
+                "Notebook",
+                "Notebook para trabalho",
+                new BigDecimal("4500.00"),
+                "NOTE-001",
+                true,
+                categoryResponse,
+                LocalDateTime.now()
+        );
 
         when(productService.create(any(ProductCreateRequest.class)))
-                .thenReturn(product);
+                .thenReturn(response);
 
         mockMvc.perform(
                         post("/api/products")
@@ -100,7 +124,9 @@ class ProductControllerTest {
                 .andExpect(jsonPath("$.name")
                         .value("Notebook"))
                 .andExpect(jsonPath("$.sku")
-                        .value("NOTE-001"));
+                        .value("NOTE-001"))
+                .andExpect(jsonPath("$.category.name")
+                        .value("Informática"));
     }
 
     @Test
@@ -137,17 +163,27 @@ class ProductControllerTest {
         request.setCategoryId(1L);
         request.setActive(true);
 
-        Product product = new Product();
+        CategoryResponse categoryResponse = new CategoryResponse(
+                1L,
+                "Informática",
+                LocalDateTime.now()
+        );
 
-        product.setName("Notebook atualizado");
-        product.setPrice(new BigDecimal("5000.00"));
-        product.setSku("NOTE-002");
-        product.setActive(true);
+        ProductResponse response = new ProductResponse(
+                1L,
+                "Notebook atualizado",
+                "Descrição atualizada",
+                new BigDecimal("5000.00"),
+                "NOTE-002",
+                true,
+                categoryResponse,
+                LocalDateTime.now()
+        );
 
         when(productService.update(
                 eq(1L),
                 any(ProductUpdateRequest.class)
-        )).thenReturn(product);
+        )).thenReturn(response);
 
         mockMvc.perform(
                         put("/api/products/1")
@@ -158,7 +194,9 @@ class ProductControllerTest {
                 .andExpect(jsonPath("$.name")
                         .value("Notebook atualizado"))
                 .andExpect(jsonPath("$.sku")
-                        .value("NOTE-002"));
+                        .value("NOTE-002"))
+                .andExpect(jsonPath("$.category.name")
+                        .value("Informática"));
     }
 
     @Test
@@ -188,6 +226,4 @@ class ProductControllerTest {
 
         verify(productService).delete(999L);
     }
-
-
 }

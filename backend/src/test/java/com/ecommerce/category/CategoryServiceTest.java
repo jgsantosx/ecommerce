@@ -35,7 +35,7 @@ class CategoryServiceTest {
         when(categoryRepository.findById(1L))
                 .thenReturn(Optional.of(category));
 
-        Category result = categoryService.findById(1L);
+        CategoryResponse result = categoryService.findById(1L);
 
         assertNotNull(result);
         assertEquals("Eletrônicos", result.getName());

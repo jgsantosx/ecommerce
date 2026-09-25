@@ -4,23 +4,25 @@ import com.ecommerce.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.http.MediaType;
 import tools.jackson.databind.ObjectMapper;
 
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import java.time.LocalDateTime;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.verify;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(CategoryController.class)
 class CategoryControllerTest {
@@ -36,15 +38,19 @@ class CategoryControllerTest {
 
     @Test
     void shouldReturnCategoryWhenIdExists() throws Exception {
-        Category category = new Category();
-        category.setName("Eletrônicos");
+        CategoryResponse response = new CategoryResponse(
+                1L,
+                "Informática",
+                LocalDateTime.now()
+        );
 
         when(categoryService.findById(1L))
-                .thenReturn(category);
+                .thenReturn(response);
 
         mockMvc.perform(get("/api/categories/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Eletrônicos"));
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.name").value("Informática"));
     }
 
     @Test
@@ -84,13 +90,16 @@ class CategoryControllerTest {
         CategoryUpdateRequest request = new CategoryUpdateRequest();
         request.setName("Eletrônicos e Informática");
 
-        Category updatedCategory = new Category();
-        updatedCategory.setName("Eletrônicos e Informática");
+        CategoryResponse response = new CategoryResponse(
+                1L,
+                "Eletrônicos e Informática",
+                LocalDateTime.now()
+        );
 
         when(categoryService.update(
                 eq(1L),
                 any(CategoryUpdateRequest.class)
-        )).thenReturn(updatedCategory);
+        )).thenReturn(response);
 
         mockMvc.perform(
                         put("/api/categories/1")
@@ -98,6 +107,7 @@ class CategoryControllerTest {
                                 .content(objectMapper.writeValueAsString(request))
                 )
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name")
                         .value("Eletrônicos e Informática"));
     }
