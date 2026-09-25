@@ -29,4 +29,17 @@ public class CategoryController {
     public Category create(@Valid @RequestBody CategoryCreateRequest request) {
         return categoryService.create(request);
     }
+
+    @PutMapping("/{id}")
+    public Category update(
+            @PathVariable Long id,
+            @Valid @RequestBody CategoryUpdateRequest request
+    ) {
+        return categoryService.update(id, request);
+    }
+
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
+        categoryService.delete(id);
+    }
 }

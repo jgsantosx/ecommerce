@@ -35,4 +35,28 @@ public class CategoryService {
 
         return categoryRepository.save(category);
     }
+
+    public Category update(Long id, CategoryUpdateRequest request) {
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Categoria não encontrada: " + id
+                        )
+                );
+
+        category.setName(request.getName());
+
+        return categoryRepository.save(category);
+    }
+
+    public void delete(Long id) {
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Categoria não encontrada: " + id
+                        )
+                );
+
+        categoryRepository.delete(category);
+    }
 }

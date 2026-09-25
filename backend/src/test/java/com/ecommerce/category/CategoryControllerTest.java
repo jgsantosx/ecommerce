@@ -14,6 +14,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.mockito.Mockito.doThrow;
 
 @WebMvcTest(CategoryController.class)
 class CategoryControllerTest {
@@ -70,5 +77,76 @@ class CategoryControllerTest {
                         .value("Erro de validação"))
                 .andExpect(jsonPath("$.errors.name")
                         .value("Nome da categoria é obrigatório"));
+    }
+
+    @Test
+    void shouldUpdateCategory() throws Exception {
+        CategoryUpdateRequest request = new CategoryUpdateRequest();
+        request.setName("Eletrônicos e Informática");
+
+        Category updatedCategory = new Category();
+        updatedCategory.setName("Eletrônicos e Informática");
+
+        when(categoryService.update(
+                eq(1L),
+                any(CategoryUpdateRequest.class)
+        )).thenReturn(updatedCategory);
+
+        mockMvc.perform(
+                        put("/api/categories/1")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name")
+                        .value("Eletrônicos e Informática"));
+    }
+
+    @Test
+    void shouldReturn404WhenUpdatingNonExistingCategory() throws Exception {
+        CategoryUpdateRequest request = new CategoryUpdateRequest();
+        request.setName("Eletrônicos");
+
+        when(categoryService.update(
+                eq(999L),
+                any(CategoryUpdateRequest.class)
+        )).thenThrow(new ResourceNotFoundException(
+                "Categoria não encontrada: 999"
+        ));
+
+        mockMvc.perform(
+                        put("/api/categories/999")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                )
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message")
+                        .value("Categoria não encontrada: 999"));
+    }
+
+    @Test
+    void shouldDeleteCategory() throws Exception {
+        doNothing().when(categoryService).delete(1L);
+
+        mockMvc.perform(delete("/api/categories/1"))
+                .andExpect(status().isOk());
+
+        verify(categoryService).delete(1L);
+    }
+
+    @Test
+    void shouldReturn404WhenDeletingNonExistingCategory() throws Exception {
+        doThrow(new ResourceNotFoundException(
+                "Categoria não encontrada: 999"
+        )).when(categoryService).delete(999L);
+
+        mockMvc.perform(delete("/api/categories/999"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message")
+                        .value("Categoria não encontrada: 999"));
+
+        verify(categoryService).delete(999L);
     }
 }
