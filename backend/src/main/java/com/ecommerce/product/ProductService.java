@@ -3,7 +3,9 @@ package com.ecommerce.product;
 import com.ecommerce.category.Category;
 import com.ecommerce.category.CategoryRepository;
 import com.ecommerce.exception.ResourceNotFoundException;
+import com.ecommerce.stock.StockService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -13,13 +15,16 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final StockService stockService;
 
     public ProductService(
             ProductRepository productRepository,
-            CategoryRepository categoryRepository
+            CategoryRepository categoryRepository,
+            StockService stockService
     ) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
+        this.stockService = stockService;
     }
 
     public List<ProductResponse> findAll() {
@@ -40,6 +45,8 @@ public class ProductService {
         return ProductResponse.fromEntity(product);
     }
 
+    // Produto e estoque são criados na mesma transação: ou os dois, ou nenhum.
+    @Transactional
     public ProductResponse create(ProductCreateRequest request) {
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() ->
@@ -59,6 +66,8 @@ public class ProductService {
         product.setCreatedAt(LocalDateTime.now());
 
         Product savedProduct = productRepository.save(product);
+
+        stockService.initialize(savedProduct);
 
         return ProductResponse.fromEntity(savedProduct);
     }

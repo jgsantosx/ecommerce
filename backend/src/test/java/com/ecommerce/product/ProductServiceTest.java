@@ -2,6 +2,7 @@ package com.ecommerce.product;
 import com.ecommerce.category.Category;
 import com.ecommerce.category.CategoryRepository;
 import com.ecommerce.exception.ResourceNotFoundException;
+import com.ecommerce.stock.StockService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,6 +24,9 @@ class ProductServiceTest {
 
     @Mock
     private CategoryRepository categoryRepository;
+
+    @Mock
+    private StockService stockService;
 
     @InjectMocks
     private ProductService productService;
@@ -74,6 +78,7 @@ class ProductServiceTest {
 
         verify(categoryRepository).findById(1L);
         verify(productRepository).save(any(Product.class));
+        verify(stockService).initialize(savedProduct);
     }
 
     @Test
