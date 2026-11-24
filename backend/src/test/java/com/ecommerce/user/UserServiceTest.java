@@ -1,5 +1,6 @@
 package com.ecommerce.user;
 
+import com.ecommerce.exception.BusinessException;
 import com.ecommerce.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -97,9 +98,9 @@ class UserServiceTest {
         when(userRepository.existsByEmail("joao@email.com"))
                 .thenReturn(true);
 
-        IllegalArgumentException exception =
+        BusinessException exception =
                 assertThrows(
-                        IllegalArgumentException.class,
+                        BusinessException.class,
                         () -> userService.create(request)
                 );
 

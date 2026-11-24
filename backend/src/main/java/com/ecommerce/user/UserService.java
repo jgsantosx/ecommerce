@@ -1,5 +1,6 @@
 package com.ecommerce.user;
 
+import com.ecommerce.exception.BusinessException;
 import com.ecommerce.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -42,7 +43,7 @@ public class UserService {
     public UserResponse create(UserCreateRequest request) {
 
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException(
+            throw new BusinessException(
                     "E-mail já cadastrado: " + request.getEmail()
             );
         }
