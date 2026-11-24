@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Quadrado na cor da marca (mesmo valor de --brand em src/index.css). -->
+  <rect width="32" height="32" rx="8" fill="#ff5a1f"/>
+  <!-- Monograma D em branco: haste + bojo, com o vazado interno (evenodd). -->
+  <path fill="#ffffff" fill-rule="evenodd" d="M9 7.5h6.2a8.5 8.5 0 0 1 0 17H9Z M13 11.3v9.4h2.2a4.7 4.7 0 0 0 0-9.4Z"/>
+</svg>
