@@ -1,6 +1,9 @@
 package com.ecommerce.user;
 
+import com.ecommerce.security.AuthenticatedUser;
 import jakarta.validation.Valid;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +21,12 @@ public class UserController {
     @GetMapping
     public List<UserResponse> findAll() {
         return userService.findAll();
+    }
+
+    /** Dados do próprio usuário logado. Declarado antes de /{id} só por clareza. */
+    @GetMapping("/me")
+    public UserResponse me(@AuthenticationPrincipal Jwt jwt) {
+        return userService.findById(AuthenticatedUser.id(jwt));
     }
 
     @GetMapping("/{id}")

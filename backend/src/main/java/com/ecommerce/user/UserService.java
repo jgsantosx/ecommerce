@@ -65,4 +65,26 @@ public class UserService {
 
         return UserResponse.fromEntity(savedUser);
     }
+
+    /**
+     * Ativa/desativa um usuário. Um usuário inativo não consegue mais fazer login.
+     * Atenção: tokens já emitidos continuam válidos até expirar (até 2h), porque
+     * a API é stateless e não consulta o banco a cada requisição.
+     */
+    public UserResponse setActive(Long id, boolean active, Long currentUserId) {
+        if (id.equals(currentUserId) && !active) {
+            throw new BusinessException("Você não pode desativar a sua própria conta");
+        }
+
+        User user = userRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Usuário não encontrado: " + id
+                        )
+                );
+
+        user.setActive(active);
+
+        return UserResponse.fromEntity(userRepository.save(user));
+    }
 }
