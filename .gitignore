@@ -22,3 +22,5 @@ frontend/dist/
 # OS
 .DS_Store
 Thumbs.db
+# Uploads locais de imagens (conteudo enviado, nao versionar)
+backend/uploads/
